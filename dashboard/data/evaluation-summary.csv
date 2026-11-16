@@ -1,0 +1,9 @@
+metric,value
+Accuracy,0.7062
+Macro precision,0.6991
+Macro recall,0.6619
+Macro F1,0.6555
+Weighted F1,0.6912
+Training records,1986.0
+Held-out test records,497.0
+Role categories,24.0

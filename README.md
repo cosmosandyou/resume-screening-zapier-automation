@@ -4,6 +4,8 @@ A Flask service that accepts a PDF resume, evaluates it against explicit job cri
 
 The project includes reproducible, privacy-preserving EDA on the public 2022 Resume Dataset. Read the [full EDA report](reports/2022-resume-dataset-report.md) for real charts, findings, data limitations, and the system architecture.
 
+A refreshable Power BI Desktop report, its aggregate source data, and refresh instructions are in the [dashboard](dashboard/README.md) folder.
+
 
 ## Architecture
 
