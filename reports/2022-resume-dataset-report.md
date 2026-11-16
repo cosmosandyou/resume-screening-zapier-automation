@@ -37,12 +37,40 @@ Quality checks found **0.04%** missing resume text, **0%** missing category labe
 
 ![Data quality and extractable signals](figures/data-quality-signals.png)
 
+## Held-out role-category classification baseline
+
+To add a concrete supervised benchmark, the project evaluates a **TF-IDF plus LinearSVC** classifier against the dataset's 24 job-category labels. This is a text-classification task, not a prediction of employment outcomes or candidate suitability.
+
+Methodology:
+
+- Removed the one record with blank resume text, leaving **2,483** records.
+- Used an **80/20 stratified train-test split** with `random_seed=42`: **1,986** training records and **497** held-out test records.
+- Converted text into lower-cased English-stopword-filtered TF-IDF unigrams and bigrams, capped at 15,000 features.
+- Trained a linear support-vector classifier (`LinearSVC`) only on the training partition.
+
+| Metric | Held-out result |
+| --- | ---: |
+| Accuracy | 70.62% |
+| Macro precision | 69.91% |
+| Macro recall | 66.19% |
+| Macro F1 | 65.55% |
+| Weighted F1 | 69.12% |
+
+![Per-category F1 score](figures/category-f1-by-class.png)
+
+The per-category view is essential: Designer (F1 **0.86**) and Information Technology (F1 **0.84**) classify well in this split, while BPO has F1 **0.00** on only four held-out examples. The macro F1 score prevents large or easier categories from hiding weaker minority-category performance.
+
+![Category confusion matrix](figures/category-confusion-matrix.png)
+
+The full machine-readable [evaluation output](category-classification-metrics.json) records the model configuration, split, aggregate metrics, and per-category results. Reproduce it with `python scripts\evaluate_category_baseline.py` after downloading the local CSV.
+
 ## Findings and limitations
 
 1. The data is suitable for text-extraction checks, category exploration, and testing that the pipeline handles varied resume formats.
 2. The `Category` field is a job-domain label—not an employment outcome or ground-truth job-fit score. This dataset cannot justify claims about screening precision, recall, fairness, or employment-outcome accuracy.
 3. Before deploying a recommendation threshold, obtain consented, role-specific resume–job pairs with independent human suitability labels. Evaluate precision, recall, false-positive/negative rates, calibration, and disparate impact on a held-out set.
 4. The source contains potentially personal resume content. Preserve data minimization: analyze locally, retain only aggregate outputs, and never send resumes to Zapier or an LLM without a lawful basis and explicit policy.
+5. The supervised metrics above evaluate category labels only. They must not be presented as hiring accuracy, candidate quality, or job-fit accuracy.
 
 ## System architecture
 

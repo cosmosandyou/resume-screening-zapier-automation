@@ -41,11 +41,23 @@ curl.exe -X POST http://127.0.0.1:5000/screen -F "resume=@C:\path\resume.pdf" -F
 | Broken/non-PDF upload | Returns a clear 400/422 error. |
 | Zapier unavailable | Returns HTTP 502 with the screening payload so the caller can retry without losing it. |
 
-## Testing, evaluation, and accuracy boundaries
+## Testing and evaluation
 
-Run `pytest`. The test suite verifies the deterministic scoring baseline and missing-email path. The repository’s [2022 Dataset EDA Report](reports/2022-resume-dataset-report.md) analyzes 2,484 public resumes across 24 job categories, but those category labels are not hiring outcomes. Therefore, this project makes **no claim** of hiring accuracy, screening precision, recall, or fairness from that data.
+Run `python -m pytest -q`. The test suite verifies the deterministic scoring baseline and missing-email path.
 
-To measure screening quality responsibly, collect consented, role-specific resume–job pairs with independent human suitability labels. Evaluate precision (of candidates recommended, how many reviewers judge qualified), recall (of qualified candidates, how many are recommended), false-positive/negative rates, calibration, and disparate impact on a held-out set.
+The repository also includes a reproducible held-out role-category benchmark using 2,483 non-empty resumes and 24 public category labels. A TF-IDF plus LinearSVC baseline, evaluated with an 80/20 stratified split (`random_seed=42`), achieved:
+
+| Metric | Held-out result |
+| --- | ---: |
+| Accuracy | 70.62% |
+| Macro precision | 69.91% |
+| Macro recall | 66.19% |
+| Macro F1 | 65.55% |
+| Weighted F1 | 69.12% |
+
+The complete methodology, confusion matrix, and per-category F1 scores are in the [2022 Dataset EDA Report](reports/2022-resume-dataset-report.md). These metrics measure **job-category classification**, not employment outcomes or job-fit recommendations.
+
+To evaluate job-fit recommendations, collect consented, role-specific resume-job pairs with independent human suitability labels. Then measure precision, recall, F1, calibration, false-positive/negative rates, and disparate impact on a held-out set.
 
 ## Example webhook payload
 
